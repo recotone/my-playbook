@@ -1,0 +1,21 @@
+#主机
+- hosts: master
+#变量
+  vars:
+    app_name: "{{app_name}}"
+    volumes: "{{volumes}}"
+#远端的执行权限
+  remote_user: root
+  tasks:
+  - name: kubectl pv
+    with_items: "{{volumes}}"
+    shell: kubectl delete -f /home/yh/workspace/playbook/dest-gfs/{{app_name}}-{{item}}-pv.yaml
+  - name: kubectl pvc
+    with_items: "{{volumes}}"
+    shell: kubectl delete -f /home/yh/workspace/playbook/dest-gfs/{{app_name}}-{{item}}-pvc.yaml
+  - name: kubectl namespace epsvc
+    shell: kubectl delete -f /home/yh/workspace/playbook/dest-gfs/{{app_name}}-epsvc.yaml && kubectl delete -f /home/yh/workspace/playbook/dest-gfs/{{app_name}}-namespace.yaml
+  - name: delete gfs dir and gfs
+    with_items: "{{volumes}}"
+    shell: gluster volume stop {{app_name}}-{{item}} && gluster volume delete {{app_name}}-{{item}}
+

@@ -1,0 +1,22 @@
+---
+kind: List
+apiVersion: v1
+items:
+- kind: Endpoints
+  apiVersion: v1
+  metadata:
+    name: gfs-{{app_name}}-svc
+    namespace: {{app_name}}
+  subsets:
+  - addresses:
+    - ip: 192.168.229.8
+    ports:
+    - port: 1
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: gfs-{{app_name}}-svc
+    namespace: {{app_name}}
+  spec:
+    ports:
+      - port: 1
