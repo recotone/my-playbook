@@ -14,6 +14,7 @@
     app_name: "{{app_name}}"
     volumes: "{{volumes}}"
     storage: 1Gi
+    homepath: "/home/yh/workspace/my-playbook"
 #远端的执行权限
   remote_user: root
   tasks:
@@ -24,17 +25,17 @@
     with_items: "{{volumes}}"
     shell: gluster volume start {{app_name}}-{{item}}
   - name: file namespace
-    template: src=./template-gfs/gfs-namespace.yaml dest=/home/yh/workspace/playbook/dest-gfs/{{app_name}}-namespace.yaml
+    template: src=./template-gfs/gfs-namespace.yaml dest={{homepath}}/dest-gfs/{{app_name}}-namespace.yaml
   - name: file app ep svc
-    template: src=./template-gfs/gfs-epsvc.yaml dest=/home/yh/workspace/playbook/dest-gfs/{{app_name}}-epsvc.yaml
+    template: src=./template-gfs/gfs-epsvc.yaml dest={{homepath}}/dest-gfs/{{app_name}}-epsvc.yaml
   - name: file pv
     with_items: "{{volumes}}"
-    template: src=./template-gfs/gfs-pv.yaml dest=/home/yh/workspace/playbook/dest-gfs/{{app_name}}-{{item}}-pv.yaml
+    template: src=./template-gfs/gfs-pv.yaml dest={{homepath}}/dest-gfs/{{app_name}}-{{item}}-pv.yaml
   - name: file pvc
     with_items: "{{volumes}}"
-    template: src=./template-gfs/gfs-pvc.yaml dest=/home/yh/workspace/playbook/dest-gfs/{{app_name}}-{{item}}-pvc.yaml
+    template: src=./template-gfs/gfs-pvc.yaml dest={{homepath}}/dest-gfs/{{app_name}}-{{item}}-pvc.yaml
   - name: kubectl namespace epsvc
-    shell: kubectl create -f /home/yh/workspace/playbook/dest-gfs/{{app_name}}-namespace.yaml && kubectl create -f /home/yh/workspace/playbook/dest-gfs/{{app_name}}-epsvc.yaml
+    shell: kubectl create -f {{homepath}}/dest-gfs/{{app_name}}-namespace.yaml && kubectl create -f {{homepath}}/dest-gfs/{{app_name}}-epsvc.yaml
   - name: kubectl pv
     with_items: "{{volumes}}"
     shell: kubectl create -f /home/yh/workspace/playbook/dest-gfs/{{app_name}}-{{item}}-pv.yaml
