@@ -38,7 +38,7 @@
     shell: kubectl create -f {{homepath}}/dest-gfs/{{app_name}}-namespace.yaml && kubectl create -f {{homepath}}/dest-gfs/{{app_name}}-epsvc.yaml
   - name: kubectl pv
     with_items: "{{volumes}}"
-    shell: kubectl create -f /home/yh/workspace/playbook/dest-gfs/{{app_name}}-{{item}}-pv.yaml
+    shell: kubectl create -f {{homepath}}/dest-gfs/{{app_name}}-{{item}}-pv.yaml
   - name: kubectl pvc
     with_items: "{{volumes}}"
-    shell: kubectl create -f /home/yh/workspace/playbook/dest-gfs/{{app_name}}-{{item}}-pvc.yaml
+    shell: kubectl create -f {{homepath}}/dest-gfs/{{app_name}}-{{item}}-pvc.yaml
