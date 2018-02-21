@@ -5,7 +5,7 @@ items:
 - kind: Endpoints
   apiVersion: v1
   metadata:
-    name: gfs-mysql-svc
+    name: gfs-mysql-endpoint
     namespace: mysql
   subsets:
   - addresses:
@@ -15,7 +15,7 @@ items:
 - kind: Service
   apiVersion: v1
   metadata:
-    name: gfs-mysql-svc
+    name: gfs-mysql-endpoint
     namespace: mysql
   spec:
     ports:

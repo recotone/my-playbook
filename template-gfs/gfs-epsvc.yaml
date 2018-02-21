@@ -5,7 +5,7 @@ items:
 - kind: Endpoints
   apiVersion: v1
   metadata:
-    name: gfs-{{app_name}}-svc
+    name: gfs-{{app_name}}-endpoint
     namespace: {{app_name}}
   subsets:
   - addresses:
@@ -15,7 +15,7 @@ items:
 - kind: Service
   apiVersion: v1
   metadata:
-    name: gfs-{{app_name}}-svc
+    name: gfs-{{app_name}}-endpoint
     namespace: {{app_name}}
   spec:
     ports:
