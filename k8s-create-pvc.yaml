@@ -1,5 +1,6 @@
 - hosts: all
   vars:
+    namespace: "{{namespace}}"
     app_name: "{{app_name}}"
     volumes: "{{volumes}}"
 #远端的执行权限
@@ -11,6 +12,7 @@
 #主机
 - hosts: master
   vars:
+    namespace: "{{namespace}}"
     app_name: "{{app_name}}"
     volumes: "{{volumes}}"
     storage: 1Gi
@@ -18,27 +20,62 @@
 #远端的执行权限
   remote_user: root
   tasks:
-  - name: create gfs volume
+  - name: IsExist gluster volume
     with_items: "{{volumes}}"
-    shell: gluster volume create {{app_name}}-{{item}} k8s-master:/opt/gluster/{{app_name}}/{{item}} k8s-node-1:/opt/gluster/{{app_name}}/{{item}} k8s-node-2:/opt/gluster/{{app_name}}/{{item}} force
-  - name: start volume
-    with_items: "{{volumes}}"
-    shell: gluster volume start {{app_name}}-{{item}}
-  - name: file namespace
-    template: src=./template-gfs/gfs-namespace.yaml dest={{homepath}}/dest-gfs/{{app_name}}-namespace.yaml
-  - name: file app ep svc
+    shell: gluster volume list | grep {{app_name}}-{{item}} | awk '{print $1}'
+    register: gfs_loop
+
+  - name: Create gfs volume
+    with_items: "{{gfs_loop.results}}"
+    shell: gluster volume create {{app_name}}-{{item.item}} k8s-master:/opt/gluster/{{app_name}}/{{item.item}} k8s-node-1:/opt/gluster/{{app_name}}/{{item.item}} k8s-node-2:/opt/gluster/{{app_name}}/{{item.item}} force
+    when: item.stdout == ""
+
+  - name: Start volume
+    with_items: "{{gfs_loop.results}}"
+    shell: gluster volume start {{app_name}}-{{item.item}}
+    when: item.stdout == ""
+
+  - name: IsExist namespace
+    shell: kubectl get ns | grep {{namespace}} | awk '{print $1}'
+    register: namespace_result
+
+
+  - name: File namespace
+    template: src=./template-gfs/gfs-namespace.yaml dest={{homepath}}/dest-gfs/{{namespace}}-namespace.yaml
+    when: namespace_result.stdout == ""
+
+  - name: IsExist ep-svc
+    shell: kubectl get svc -n {{namespace}} | grep gfs-{{app_name}}-endpoint  | awk '{print $1}'
+    register: epsvc_result
+
+
+  - name: File app ep-svc
     template: src=./template-gfs/gfs-epsvc.yaml dest={{homepath}}/dest-gfs/{{app_name}}-epsvc.yaml
-  - name: file pv
+    when: epsvc_result.stdout == ""
+
+
+  - name: File pv
     with_items: "{{volumes}}"
     template: src=./template-gfs/gfs-pv.yaml dest={{homepath}}/dest-gfs/{{app_name}}-{{item}}-pv.yaml
-  - name: file pvc
+
+
+  - name: File pvc
     with_items: "{{volumes}}"
     template: src=./template-gfs/gfs-pvc.yaml dest={{homepath}}/dest-gfs/{{app_name}}-{{item}}-pvc.yaml
-  - name: kubectl namespace epsvc
-    shell: kubectl create -f {{homepath}}/dest-gfs/{{app_name}}-namespace.yaml && kubectl create -f {{homepath}}/dest-gfs/{{app_name}}-epsvc.yaml
+    
+
+  - name: kubectl namespace
+    shell: kubectl create -f {{homepath}}/dest-gfs/{{namespace}}-namespace.yaml
+    when: namespace_result.stdout == ""
+
+  - name: kubectl epsvc
+    shell: kubectl create -f {{homepath}}/dest-gfs/{{app_name}}-epsvc.yaml
+    when: epsvc_result.stdout == ""
+
   - name: kubectl pv
     with_items: "{{volumes}}"
     shell: kubectl create -f {{homepath}}/dest-gfs/{{app_name}}-{{item}}-pv.yaml
+
   - name: kubectl pvc
     with_items: "{{volumes}}"
     shell: kubectl create -f {{homepath}}/dest-gfs/{{app_name}}-{{item}}-pvc.yaml
