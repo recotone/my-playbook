@@ -1,11 +1,11 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: gfs-{{app_name}}-{{item}}-pvc
-  namespace: {{namespace}}
+  name: gfs-maven-local-pvc
+  namespace: jenkins
 spec:
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: {{storage}}
+      storage: 1Gi

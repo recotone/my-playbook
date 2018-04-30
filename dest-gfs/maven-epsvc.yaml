@@ -5,8 +5,8 @@ items:
 - kind: Endpoints
   apiVersion: v1
   metadata:
-    name: gfs-{{app_name}}-endpoint
-    namespace: {{namespace}}
+    name: gfs-maven-endpoint
+    namespace: jenkins
   subsets:
   - addresses:
     - ip: 192.168.229.8
@@ -15,8 +15,8 @@ items:
 - kind: Service
   apiVersion: v1
   metadata:
-    name: gfs-{{app_name}}-endpoint
-    namespace: {{namespace}}
+    name: gfs-maven-endpoint
+    namespace: jenkins
   spec:
     ports:
       - port: 1
