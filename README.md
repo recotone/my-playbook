@@ -6,5 +6,5 @@
 example: <br> 
 * <code> ansible-playbook -v k8s-create-pvc.yaml --extra-vars "namespace=gitlab app_name=gitlab volumes=['vol']" </code><br>
 * <code> ansible-playbook k8s-cr-gfs.yaml --extra-vars "app_name=jenkins volumes=['data']" </code><br>
-* ansible-playbook k8s-del-gfs.yaml --extra-vars "app_name=jenkins volumes=['aaa'] isDeldir=true" </code><br>
+* <code> ansible-playbook k8s-del-gfs.yaml --extra-vars "app_name=jenkins volumes=['aaa'] isDeldir=true" </code><br>
 
